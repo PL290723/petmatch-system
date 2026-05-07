@@ -10,6 +10,8 @@ export default function Dashboard({ setCurrentView }) {
   const [historicalData, setHistoricalData] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [error, setError] = useState(null);
+
   useEffect(() => {
     async function loadData() {
       try {
@@ -46,6 +48,7 @@ export default function Dashboard({ setCurrentView }) {
         }
       } catch (err) {
         console.error("Error loading dashboard data", err);
+        setError(err.message || "Error de conexión con el servidor");
       } finally {
         setLoading(false);
       }
@@ -53,10 +56,21 @@ export default function Dashboard({ setCurrentView }) {
     loadData();
   }, []);
 
-  if (loading || !stats) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (error || !stats) {
+    return (
+      <div className="bg-red-50 text-red-600 p-6 rounded-lg text-center font-medium shadow-sm border border-red-200">
+        <AlertCircle size={32} className="mx-auto mb-2 opacity-80" />
+        <p>No se pudo conectar con el servidor.</p>
+        <p className="text-sm opacity-80 mt-1">{error}</p>
+        <button onClick={() => window.location.reload()} className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition">Reintentar</button>
       </div>
     );
   }

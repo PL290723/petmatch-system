@@ -4,7 +4,8 @@
   "description": "Sistema de gestión para refugios PetMatch",
   "main": "out/electron/main.js",
   "scripts": {
-    "start:api": "ts-node src/server.ts",
+    "start:dev": "ts-node src/server.ts",
+    "start:api": "node out/src/server.js",
     "build:frontend": "cd ../frontend && npm run build && mkdir -p ../petmatch-system/out/dist && cp -r dist/* ../petmatch-system/out/dist/",
     "build:backend": "npx tsc",
     "prepack": "npm run build:frontend && npm run build:backend",
