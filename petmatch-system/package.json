@@ -4,6 +4,7 @@
   "description": "Sistema de gestión para refugios PetMatch",
   "main": "out/electron/main.js",
   "scripts": {
+    "start:api": "ts-node src/server.ts",
     "build:frontend": "cd ../frontend && npm run build && mkdir -p ../petmatch-system/out/dist && cp -r dist/* ../petmatch-system/out/dist/",
     "build:backend": "npx tsc",
     "prepack": "npm run build:frontend && npm run build:backend",
@@ -19,19 +20,15 @@
     },
     "files": [
       "out/**/*",
-      "package.json",
-      "node_modules/.prisma/**/*",
-      "node_modules/@prisma/client/**/*"
-    ],
-    "asarUnpack": [
-      "node_modules/.prisma/**/*",
-      "node_modules/@prisma/client/**/*"
+      "package.json"
     ],
     "extraResources": [
       {
         "from": "prisma",
         "to": "prisma",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       },
       {
         "from": ".env",
@@ -39,7 +36,9 @@
       }
     ],
     "linux": {
-      "target": ["AppImage"]
+      "target": [
+        "AppImage"
+      ]
     },
     "win": {
       "target": "nsis"
@@ -51,10 +50,14 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
+    "cors": "^2.8.6",
     "dotenv": "^17.4.2",
+    "express": "^5.2.1",
     "pg": "^8.20.0"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
     "@types/node": "^25.6.0",
     "@types/pg": "^8.20.0",
     "electron": "^41.3.0",
