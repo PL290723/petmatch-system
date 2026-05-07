@@ -1,0 +1,249 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// 1. Refugios
+model Shelter {
+  id          String      @id @default(uuid())
+  name        String
+  address     String
+  animals     Animal[]
+  rescuers    Rescuer[]
+  volunteers  Volunteer[]
+  donations   Donation[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+// 2. Rescatistas
+model Rescuer {
+  id        String   @id @default(uuid())
+  name      String
+  phone     String
+  shelterId String
+  shelter   Shelter  @relation(fields: [shelterId], references: [id])
+  animals   Animal[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// 3. Animales
+model Animal {
+  id              String   @id @default(uuid())
+  name            String
+  species         String
+  breed           String
+  energyLevel     EnergyLevel @default(MEDIUM)
+  
+  shelterId       String
+  shelter         Shelter  @relation(fields: [shelterId], references: [id])
+  
+  rescuerId       String?
+  rescuer         Rescuer? @relation(fields: [rescuerId], references: [id])
+  
+  medicalHistory  MedicalHistory?
+  vaccinations    VaccinationSchedule[]
+  behaviorTests   BehaviorTest[]
+  adoptionContract AdoptionContract?
+  expenses        AnimalExpense[]
+  abuseReports    AbuseReport[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+enum EnergyLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+// 4. Historial Médico
+model MedicalHistory {
+  id          String   @id @default(uuid())
+  animalId    String   @unique
+  animal      Animal   @relation(fields: [animalId], references: [id])
+  diagnosis   String
+  treatment   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// 5. Esquema de Vacunación
+model VaccinationSchedule {
+  id               String    @id @default(uuid())
+  animalId         String
+  animal           Animal    @relation(fields: [animalId], references: [id])
+  vaccineName      String
+  dateAdministered DateTime?
+  nextDueDate      DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+// 6. Pruebas de Comportamiento
+model BehaviorTest {
+  id          String   @id @default(uuid())
+  animalId    String
+  animal      Animal   @relation(fields: [animalId], references: [id])
+  testerName  String
+  score       Int
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// 7. Candidatos a Adoptantes
+model AdopterCandidate {
+  id               String   @id @default(uuid())
+  fullName         String
+  email            String   @unique
+  phone            String
+  status           AdopterStatus @default(ACTIVE)
+  
+  questionnaires   CompatibilityQuestionnaire[]
+  inspectionVisits InspectionVisit[]
+  adoptionContracts AdoptionContract[]
+  followUps        PostAdoptionFollowUp[]
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+enum AdopterStatus {
+  ACTIVE
+  IN_PROCESS
+  BLOCKED
+  APPROVED
+}
+
+// 8. Cuestionarios de Compatibilidad
+model CompatibilityQuestionnaire {
+  id                String   @id @default(uuid())
+  candidateId       String   @unique
+  candidate         AdopterCandidate @relation(fields: [candidateId], references: [id])
+  
+  // 1. Vivienda
+  housingType       String // Casa, Departamento, Rancho
+  homeOwnership     String // Propia, Rentada
+  hasYard           Boolean
+  yardFenced        Boolean
+  kidsInHome        Boolean
+  allergies         Boolean
+  familyAgreement   Boolean
+
+  // 2. Estilo de vida
+  hoursAlone        Int // Horas al día
+  activityLevel     String // SEDENTARY, MODERATE, HIGH
+  travelFrequency   String // LOW, MEDIUM, HIGH
+
+  // 3. Historial
+  hasOtherPets      Boolean
+  hadPetsBefore     Boolean
+  hasVet            Boolean
+
+  // 4. Finanzas / Expectativas
+  monthlyBudget     Float
+  adoptionPurpose   String // Compañía, Guardia, Regalo
+  returnConditions  String
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// 9. Visitas de Inspección
+model InspectionVisit {
+  id          String   @id @default(uuid())
+  candidateId String
+  candidate   AdopterCandidate @relation(fields: [candidateId], references: [id])
+  visitDate   DateTime
+  inspector   String
+  status      VisitStatus
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum VisitStatus {
+  PENDING
+  PASSED
+  FAILED
+}
+
+// 10. Contratos de Adopción
+model AdoptionContract {
+  id            String   @id @default(uuid())
+  animalId      String   @unique
+  animal        Animal   @relation(fields: [animalId], references: [id])
+  candidateId   String
+  candidate     AdopterCandidate @relation(fields: [candidateId], references: [id])
+  signedDate    DateTime @default(now())
+  termsAccepted Boolean
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// 11. Seguimiento Post-Adopción
+model PostAdoptionFollowUp {
+  id           String   @id @default(uuid())
+  candidateId  String
+  candidate    AdopterCandidate @relation(fields: [candidateId], references: [id])
+  followUpDate DateTime
+  condition    String
+  comments     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// 12. Reportes de Maltrato/Alerta
+model AbuseReport {
+  id           String   @id @default(uuid())
+  animalId     String
+  animal       Animal   @relation(fields: [animalId], references: [id])
+  reporterName String
+  description  String
+  reportDate   DateTime @default(now())
+  resolved     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// 13. Donaciones Recibidas
+model Donation {
+  id          String   @id @default(uuid())
+  shelterId   String
+  shelter     Shelter  @relation(fields: [shelterId], references: [id])
+  donorName   String?
+  amount      Float
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// 14. Gastos por Animal
+model AnimalExpense {
+  id          String   @id @default(uuid())
+  animalId    String
+  animal      Animal   @relation(fields: [animalId], references: [id])
+  description String
+  amount      Float
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// 15. Voluntarios
+model Volunteer {
+  id          String   @id @default(uuid())
+  shelterId   String
+  shelter     Shelter  @relation(fields: [shelterId], references: [id])
+  fullName    String
+  role        String
+  hoursWorked Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

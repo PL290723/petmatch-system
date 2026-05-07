@@ -1,0 +1,78 @@
+# =========================
+# DevSecOps: Strict Gitignore
+# Proyecto PetMatch & Shelter
+# =========================
+
+# 1. Variables de Entorno y Secretos (CRITICO)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+*.pfx
+*.p12
+
+# 2. Dependencias de Node
+node_modules/
+npm-debug.log
+npm-debug.log.*
+yarn-error.log
+yarn-debug.log*
+
+# 3. Archivos de Compilación y Empaquetado
+dist/
+build/
+out/
+release/
+*.exe
+*.AppImage
+*.deb
+*.rpm
+*.dmg
+*.zip
+*.tar.gz
+*.sys
+*.dll
+
+# 4. Bases de Datos Locales
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+
+# 5. Logs y Temporales
+logs
+*.log
+*.pid
+*.seed
+*.pid.lock
+.temp/
+.tmp/
+coverage/
+.nyc_output/
+
+# 6. Archivos de Sistema Operativo
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# 7. IDE y Editores
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*.swo
+
+# 8. Archivos Específicos de Electron
+dist-electron/
+dist-ssr/
+release-builds/

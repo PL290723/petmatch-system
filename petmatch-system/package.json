@@ -1,0 +1,60 @@
+{
+  "name": "petmatch-system",
+  "version": "1.0.0",
+  "description": "Sistema de gestión para refugios PetMatch",
+  "main": "out/electron/main.js",
+  "scripts": {
+    "build:frontend": "cd ../frontend && npm run build && mkdir -p ../petmatch-system/out/dist && cp -r dist/* ../petmatch-system/out/dist/",
+    "build:backend": "npx tsc",
+    "prepack": "npm run build:frontend && npm run build:backend",
+    "pack:linux": "npm run prepack && electron-builder --linux",
+    "pack:windows": "npm run prepack && electron-builder --win",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "build": {
+    "appId": "com.petmatch.system",
+    "productName": "PetMatch",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "out/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "prisma",
+        "to": "prisma",
+        "filter": ["**/*"]
+      },
+      {
+        "from": ".env",
+        "to": "."
+      }
+    ],
+    "linux": {
+      "target": ["AppImage"]
+    },
+    "win": {
+      "target": "nsis"
+    }
+  },
+  "keywords": [],
+  "author": "PetMatch",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "dotenv": "^17.4.2",
+    "pg": "^8.20.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "@types/pg": "^8.20.0",
+    "electron": "^41.3.0",
+    "electron-builder": "^26.8.1",
+    "prisma": "^7.8.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3"
+  }
+}
